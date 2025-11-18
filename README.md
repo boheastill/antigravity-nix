@@ -15,10 +15,10 @@ Nix flake for [Google Antigravity](https://antigravity.google) - Next-generation
 
 ```bash
 # Try it out without installing
-nix run github:yourusername/antigravity-nix
+nix run github:jacopone/antigravity-nix
 
 # Install to your profile
-nix profile install github:yourusername/antigravity-nix
+nix profile install github:jacopone/antigravity-nix
 ```
 
 ### Option 2: NixOS Configuration
@@ -30,7 +30,7 @@ Add to your `flake.nix` inputs:
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     antigravity-nix = {
-      url = "github:yourusername/antigravity-nix";
+      url = "github:jacopone/antigravity-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -117,7 +117,7 @@ nixpkgs = import inputs.nixpkgs {
 ### Building Locally
 
 ```bash
-git clone https://github.com/yourusername/antigravity-nix.git
+git clone https://github.com/jacopone/antigravity-nix.git
 cd antigravity-nix
 nix build
 ```
