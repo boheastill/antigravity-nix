@@ -10,15 +10,15 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 log_info() {
-    echo -e "${GREEN}[INFO]${NC} $*"
+    echo -e "${GREEN}[INFO]${NC} $*" >&2
 }
 
 log_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $*"
+    echo -e "${YELLOW}[WARN]${NC} $*" >&2
 }
 
 log_error() {
-    echo -e "${RED}[ERROR]${NC} $*"
+    echo -e "${RED}[ERROR]${NC} $*" >&2
 }
 
 # Function to extract version from download page
@@ -33,13 +33,14 @@ get_latest_version() {
         if node -e "require('playwright-chromium')" 2>/dev/null; then
             local version
             # Scraper outputs version to stdout, logs to stderr - capture only stdout
-            version=$(CHROME_BIN=${CHROME_BIN:-/run/current-system/sw/bin/google-chrome-stable} node "$(dirname "$0")/scrape-version.js")
+            version=$(node "$(dirname "$0")/scrape-version.js" 2>/dev/null | tr -d '\n\r')
 
             if [[ -n "$version" ]] && [[ "$version" =~ ^[0-9.]+-[0-9]+$ ]]; then
                 echo "$version"
                 return 0
             else
-                log_warn "Browser scraping failed, falling back to curl"
+                log_warn "Browser scraping returned invalid version: [$version]"
+                log_warn "Falling back to curl"
             fi
         else
             log_warn "Playwright not available, falling back to curl"
@@ -151,6 +152,13 @@ main() {
         log_warn "Could not fetch latest version. Keeping current version."
         exit 0
     fi
+
+    # Validate we got a version
+    if [[ -z "$latest_version" ]]; then
+        log_error "get_latest_version returned empty string"
+        exit 1
+    fi
+
     log_info "Latest version: $latest_version"
 
     # Check if update is needed

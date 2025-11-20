@@ -10,13 +10,18 @@ async function scrapeVersion() {
   console.error('[INFO] Launching browser...');
 
   // On NixOS, use system Chrome if available
+  // In CI/other environments, let Playwright use bundled Chromium
   const chromePath = process.env.CHROME_BIN ||
                      process.env.CHROME_PATH ||
                      '/run/current-system/sw/bin/google-chrome-stable';
 
+  // Check if the Chrome path exists before using it
+  const fs = require('fs');
+  const useSystemChrome = fs.existsSync(chromePath);
+
   const browser = await chromium.launch({
     headless: true,
-    executablePath: chromePath,
+    ...(useSystemChrome && { executablePath: chromePath }),
   });
 
   try {
