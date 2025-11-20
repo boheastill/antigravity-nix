@@ -119,18 +119,12 @@ let
       export CHROME_BIN=/run/current-system/sw/bin/google-chrome-stable
       export CHROME_PATH=/run/current-system/sw/bin/google-chrome-stable
 
-      # Create Chrome policy directory for auto-installing extensions
-      CHROME_POLICY_DIR="$HOME/.config/google-chrome/policies/managed"
-      mkdir -p "$CHROME_POLICY_DIR"
+      # Use existing Chrome profile instead of creating temporary one
+      # This preserves extensions, settings, and login state
+      export CHROME_USER_DATA_DIR="$HOME/.config/google-chrome"
 
-      # Force-install Antigravity browser extension
-      cat > "$CHROME_POLICY_DIR/antigravity-extension.json" <<'EOF'
-{
-  "ExtensionInstallForcelist": [
-    "eeijfnjmjelapkebgockoeaadonbchdd;https://clients2.google.com/service/update2/crx"
-  ]
-}
-EOF
+      # Additional Chrome flags to use the default profile
+      export CHROME_FLAGS="--profile-directory=Default"
 
       exec ${antigravity-unwrapped}/lib/antigravity/antigravity "$@"
     '';
