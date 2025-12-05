@@ -37,7 +37,8 @@ jobs:
 
       - name: Install Playwright
         run: |
-          npm install -g playwright-chromium
+          # Install locally (not globally) so node can find the module
+          npm install playwright-chromium
           npx playwright install chromium
 
       - name: Configure Git
